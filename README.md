@@ -20,7 +20,7 @@
 ### 2. インストール
 
 ```bash
-npm install
+npm install @google/generative-ai
 ```
 
 ### 3. 開発サーバーの起動
