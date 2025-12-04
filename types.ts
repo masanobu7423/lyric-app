@@ -1,11 +1,11 @@
 export interface PromptScene {
   sceneNumber: number;
-  timeframe: string;
-  lyricsSegment: string;
-  visualDescription: string;
-  cameraMovement: string;
-  moodLighting: string;
-  aiPrompt: string;
+  duration: string; // 秒数
+  cutDescription: string; // カット割り（映像内容）
+  audioSE: string; // 音声・SE・音楽
+  telop: string; // テロップ
+  narration: string; // ナレーション
+  directionMemo: string; // 演出メモ（グレーディング・アングル）
 }
 
 export enum VisualStyle {

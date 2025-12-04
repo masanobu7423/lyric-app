@@ -80,18 +80,22 @@ export const generatePromptsFromLyrics = async (config: GenerationConfig): Promi
   };
 
   const systemInstruction = `
-    あなたは熟練のミュージックビデオ監督であり、AIプロンプトエンジニアです。
-    あなたの仕事は、提供された歌詞を分析し、それを魅力的なミュージックビデオにするための絵コンテを作成することです。
+    あなたは熟練のミュージックビデオ監督であり、映像制作のプロフェッショナルです。
+    あなたの仕事は、提供された歌詞を分析し、それを魅力的なミュージックビデオにするための字コンテ（絵コンテ）を作成することです。
     
     以下の手順で各歌詞パートを処理してください：
     1. 歌詞の感情やリズムを解釈し、対応する視覚的なシーンを想像してください。
-    2. シーンを細かく区切り、各カットの詳細な視覚的描写を作成してください。
+    2. シーンを細かく区切り、各カットの詳細な映像内容を作成してください。
     3. 全体を通してキャラクターやスタイルの一貫性を維持してください。
     4. **シーン数は10-20個程度に抑えてください**（重要な部分に集中）。
     
-    重要：出力言語のルール
-    - **Visual Description, Camera Movement, Mood Lighting**: 日本語で出力してください（ユーザーが内容を理解するため）。
-    - **AI Prompt**: 必ず**英語**で出力してください（AI動画生成ツールの精度を高めるため）。具体的で技術的なキーワード（例：4k, cinematic lighting, hyper-realistic, slow motion）を含めてください。
+    字コンテの項目説明：
+    - **秒数（duration）**: そのカットの長さ（例：「3秒」「5秒」）
+    - **カット割り（cutDescription）**: 映像の内容を具体的に記述（カメラアングル、被写体の動き、構図など）
+    - **音声・SE・音楽（audioSE）**: 該当する歌詞、効果音、音楽の指定
+    - **テロップ（telop）**: 画面に表示するテキスト（あれば）
+    - **ナレーション（narration）**: ナレーション原稿（あれば）
+    - **演出メモ（directionMemo）**: グレーディング（色調補正）、アングル補足、その他の演出指示
     
     スタイル要件: ${config.visualStyle}
     ${config.artistName ? `アーティストの雰囲気: ${config.artistName}` : ''}
@@ -99,16 +103,16 @@ export const generatePromptsFromLyrics = async (config: GenerationConfig): Promi
 
     単に歌詞を翻訳するのではなく、その歌詞が持つ世界観を映像として翻訳してください。
     
-    必ず以下のJSON配列形式で出力してください：
+    必ず以下のJSON配列形式で出力してください（すべて日本語で記述）：
     [
       {
         "sceneNumber": 1,
-        "timeframe": "00:00-00:05",
-        "lyricsSegment": "歌詞の一部",
-        "visualDescription": "日本語での視覚描写",
-        "cameraMovement": "日本語でのカメラワーク",
-        "moodLighting": "日本語での照明・雰囲気",
-        "aiPrompt": "Detailed English prompt for AI video generation"
+        "duration": "3秒",
+        "cutDescription": "カメラが空から降下し、都会の夜景を捉える。ネオンの光が反射する濡れたアスファルト。",
+        "audioSE": "「夜の街に消えていく」のフレーズ、雨音のSE",
+        "telop": "楽曲タイトル表示",
+        "narration": "",
+        "directionMemo": "グレーディング：青みがかった寒色系、ローアングル"
       }
     ]
   `;
