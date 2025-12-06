@@ -13,6 +13,26 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 入力フィールドとテキストエリアの文字色を明るく */
+input, textarea, select {
+  color: #f1f5f9 !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* プロンプト表示エリアの文字色 */
+.prompt-content {
+  color: #e2e8f0 !important;
+  background-color: #1e293b !important;
+}
+
+/* シーンカードの文字色 */
+.scene-card {
+  color: #f1f5f9 !important;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   height: 8px;
   width: 8px;

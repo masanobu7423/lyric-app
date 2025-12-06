@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { InputSection } from './components/InputSection';
 import { ResultsTable } from './components/ResultsTable';
-import { PromptScene, GenerationConfig } from './types';
+import { ProjectManager } from './components/ProjectManager';
+import { StoryboardGenerator } from './components/StoryboardGenerator';
+import { VideoPromptGenerator } from './components/VideoPromptGenerator';
+import { PromptScene, GenerationConfig, SavedProject, CameraAngle, CameraMovement, SpecialTechnique, VisualStyle } from './types';
 import { generatePromptsFromLyrics } from './services/geminiService';
 import { Clapperboard, Video, AlertCircle } from 'lucide-react';
 
@@ -9,11 +12,18 @@ export default function App() {
   const [scenes, setScenes] = useState<PromptScene[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentConfig, setCurrentConfig] = useState<Partial<GenerationConfig>>({
+    cameraAngle: CameraAngle.EYE_LEVEL,
+    cameraMovement: CameraMovement.NONE,
+    specialTechnique: SpecialTechnique.NONE,
+    visualStyle: VisualStyle.CINEMATIC,
+  });
 
   const handleGenerate = async (config: GenerationConfig) => {
     setIsLoading(true);
     setError(null);
     setScenes([]); // Clear previous results
+    setCurrentConfig({ ...config }); // 完全なconfigを保存
 
     try {
       const generatedScenes = await generatePromptsFromLyrics(config);
@@ -23,6 +33,19 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleProjectLoad = (project: SavedProject) => {
+    setScenes(project.scenes);
+    setCurrentConfig({
+      artistName: project.artistName,
+      songTitle: project.songTitle,
+      cameraAngle: project.cameraAngle,
+      cameraMovement: project.cameraMovement,
+      specialTechnique: project.specialTechnique,
+      visualStyle: project.visualStyle,
+    });
+    setError(null);
   };
 
   return (
@@ -72,7 +95,21 @@ export default function App() {
           </div>
 
           {/* Right Column: Results */}
-          <div className="lg:col-span-8 min-h-[500px]">
+          <div className="lg:col-span-8 min-h-[500px] space-y-6">
+            {/* プロジェクト管理 - 常に表示 */}
+            <div className="flex justify-between items-center">
+              <ProjectManager
+                currentScenes={scenes}
+                cameraAngle={currentConfig.cameraAngle || CameraAngle.EYE_LEVEL}
+                cameraMovement={currentConfig.cameraMovement || CameraMovement.NONE}
+                specialTechnique={currentConfig.specialTechnique || SpecialTechnique.NONE}
+                visualStyle={currentConfig.visualStyle || VisualStyle.CINEMATIC}
+                artistName={currentConfig.artistName}
+                songTitle={currentConfig.songTitle}
+                onProjectLoad={handleProjectLoad}
+              />
+            </div>
+
             {error && (
               <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-200 p-4 rounded-xl flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -84,7 +121,23 @@ export default function App() {
             )}
 
             {scenes.length > 0 ? (
-              <ResultsTable scenes={scenes} />
+              <>
+                <ResultsTable scenes={scenes} />
+                
+                {/* 動画生成用プロンプト生成（英語）*/}
+                <div className="mt-6">
+                  <VideoPromptGenerator 
+                    lyrics={currentConfig.lyrics || ''} 
+                    style={currentConfig.visualStyle || VisualStyle.CINEMATIC}
+                    scenes={scenes}
+                  />
+                </div>
+
+                {/* 絵コンテ生成セクション（日本語・参考用）*/}
+                <div className="mt-6">
+                  <StoryboardGenerator scenes={scenes} />
+                </div>
+              </>
             ) : (
               !isLoading && (
                 <div className="h-full flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-gray-800 rounded-xl bg-gray-900/20">
